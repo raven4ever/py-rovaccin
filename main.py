@@ -11,17 +11,17 @@ from config import Configuration
 
 def get_all_centre_vaccinare(judet, persoana):
     headers = {
-        "accept": "application/json",
-        "cookie": Configuration.cookie
+        'accept': 'application/json',
+        'cookie': Configuration.cookie
     }
     body = {
-        "countyID": judet,
-        "localityID": "",
-        "name": "",
-        "identificationCode": persoana.cnp,
-        "masterPersonnelCategoryID": -4,
-        "personnelCategoryID": 32,
-        "recipientID": persoana.recipient_id
+        'countyID': judet,
+        'localityID': '',
+        'name': '',
+        'identificationCode': persoana.cnp,
+        'masterPersonnelCategoryID': -4,
+        'personnelCategoryID': 32,
+        'recipientID': persoana.recipient_id
     }
 
     ses = requests.Session()
@@ -38,13 +38,9 @@ def get_all_centre_vaccinare(judet, persoana):
 
 
 def get_viable_centers(vaccin, centre):
-    results = []
-
-    for centru in centre:
-        if centru['availableSlots'] > 0 and centru['boosterID'] == vaccin:
-            results.append(centru)
-
-    return results
+    results = filter(lambda c: c['availableSlots'] > 0 and c['boosterID'] == vaccin, centre)
+    # print(list(results))
+    return list(results)
 
 
 def open_browser(url):
@@ -66,15 +62,15 @@ if __name__ == '__main__':
 
         if len(viable_centers) == 0:
             wait = random.randint(20, 60)
-            print(f"No results yet! Waiting {wait}s...")
+            print(f'No results yet! Waiting {wait}s...')
             time.sleep(wait)
         else:
-            print(f"Found {len(viable_centers)} results.")
+            print(f'Found {len(viable_centers)} results.')
             for res in viable_centers:
                 print(
                     f"Disponibil la {res['name']} din {res['countyName']}, localitatea {res['localityName']}, {res['address']}")
 
             open_browser(Configuration.appointment_url)
 
-            print(f"Waiting {Configuration.time_to_wait_success}s...")
+            print(f'Waiting {Configuration.time_to_wait_success}s...')
             time.sleep(Configuration.time_to_wait_success)
